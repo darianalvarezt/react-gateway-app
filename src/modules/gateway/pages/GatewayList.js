@@ -1,52 +1,99 @@
 import * as React from 'react'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
-import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import toast from "react-hot-toast"
 import Container from '@mui/material/Container'
-import Checkbox from '@mui/material/Checkbox'
 
 import useFindGateways from '../hooks/useFindGateways'
+import useDeleteManyGateway from '../hooks/useDeleteManyGateway'
 import CustomTableHead from '../components/CustomTableHead'
 import CustomTableToolbar from '../components/CustomTableToolbar'
-import CustomModal from '../components/CustomModal'
 import GatewayCreateForm from '../components/GatewayCreateForm'
+import CustomModal from '../components/CustomModal'
+import Row from '../components/Row'
+
+const headCells = [
+  {
+    id: 'serialNumber',
+    numeric: false,
+    disablePadding: true,
+    label: 'Serial Number',
+  },
+  {
+    id: 'name',
+    numeric: false,
+    disablePadding: false,
+    label: 'Name',
+  },
+  {
+    id: 'ipv4',
+    numeric: false,
+    disablePadding: false,
+    label: 'IPV4',
+  },
+  {
+    id: 'devices',
+    numeric: true,
+    disablePadding: false,
+    label: 'Devices (units)',
+  },
+]
+
+const detailsHeadCells = [
+  {
+    id: 'date',
+    numeric: false,
+    disablePadding: true,
+    label: 'Date',
+  },
+  {
+    id: 'uid',
+    numeric: true,
+    disablePadding: false,
+    label: 'UID',
+  },
+  {
+    id: 'status',
+    numeric: true,
+    disablePadding: false,
+    label: 'Status',
+  },
+  {
+    id: 'vendor',
+    numeric: true,
+    disablePadding: false,
+    label: 'Vendor',
+  },
+]
 
 const GatewayList = () => {
-    const [selected, setSelected] = React.useState([])
+    const [selected, setSelected] = React.useState(new Set([]))
     const [open, setOpen] = React.useState(false)
 
+    const {
+      error: deleteError,
+      isLoading,
+      isSuccess: deleteSuccess,
+      onDelete
+    } = useDeleteManyGateway()
 
     const handleSelectAllClick = (event) => {
       if (event.target.checked) {
-        const newSelected = gateways.map((n) => n.serialNumber);
-        setSelected(newSelected);
+        const newSelected = gateways.map((n) => n._id);
+        setSelected(new Set(newSelected));
         return;
       }
-      setSelected([]);
+      setSelected(new Set([]));
     }
   
-    const handleClick = (event, name) => {
-      const selectedIndex = selected.indexOf(name);
-      let newSelected = [];
-  
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selected, name);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selected.slice(1));
-      } else if (selectedIndex === selected.length - 1) {
-        newSelected = newSelected.concat(selected.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
-        );
+    const handleClick = (event, _id) => {
+      if (!selected.delete(_id)) {
+        selected.add(_id)
       }
   
-      setSelected(newSelected);
+      setSelected(new Set(selected));
     }
 
     const handleAddClick = () => {
@@ -54,21 +101,27 @@ const GatewayList = () => {
     }
 
     const handleRemoveClick = () => {
-
+      onDelete([...selected.values()])
     }
   
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    const isSelected = (_id) => selected.has(_id);
 
     const { error, gateways } = useFindGateways();
 
     React.useEffect(() => {
-        if (error) toast.error(error.message);
-    }, [error])
+      if (deleteSuccess) {
+        setSelected(new Set([]));
+      }
+    }, [deleteSuccess])
+
+    React.useEffect(() => {
+        if (error || deleteError) toast.error(error.message || deleteError.message);
+    }, [error, deleteError])
     
     return <Container maxWidth="lg">
     <Paper sx={{ width: '100%', mb: 2 }}>
       <CustomTableToolbar
-        numSelected={selected.length}
+        numSelected={selected.size}
         onAddClick={handleAddClick}
         onRemoveClick={handleRemoveClick}
       />
@@ -79,46 +132,25 @@ const GatewayList = () => {
           size={'small'}
         >
           <CustomTableHead
-            numSelected={selected.length}
+            headCells={headCells}
+            numSelected={selected.size}
             onSelectAllClick={handleSelectAllClick}
             rowCount={gateways?.length || 0}
           />
           <TableBody>
             {gateways?.map((row, index) => {
-                const isItemSelected = isSelected(row.serialNumber);
-                const labelId = `enhanced-table-checkbox-${index}`;
+                const isItemSelected = isSelected(row._id);
+                const labelId = `custom-table-checkbox-${index}`;
 
                 return (
-                  <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.serialNumber)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.serialNumber}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      {row.serialNumber}
-                    </TableCell>
-                    <TableCell align="left">{row.name}</TableCell>
-                    <TableCell align="left">{row.ipv4}</TableCell>
-                    <TableCell align="right">{row.devices?.length || 0}</TableCell>
-                  </TableRow>
+                  <Row
+                    key={row._id}
+                    row={row}
+                    handleClick={handleClick}
+                    labelId={labelId}
+                    isItemSelected={isItemSelected}
+                    headCells={detailsHeadCells}
+                    />
                 );
               })}
           </TableBody>
@@ -129,7 +161,9 @@ const GatewayList = () => {
         open={open}
         onClose={handleAddClick}
     >
-        <GatewayCreateForm/>
+        <GatewayCreateForm
+          onClose={handleAddClick}
+        />
     </CustomModal>
   </Container>
 
@@ -137,3 +171,5 @@ const GatewayList = () => {
 }
 
 export default GatewayList
+
+
