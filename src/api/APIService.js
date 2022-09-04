@@ -1,16 +1,15 @@
 import axios from 'axios'
-import qs from 'qs'
 
 const instance = axios.create({
     baseURL: 'http://localhost:3002',
 })
 
 const _create = (params) => {
-    return instance.post('/api/gateway/', qs.stringify(params));
+    return instance.post('/api/gateway/', params);
 };
 
-const _remove = () => {
-    return instance.delete('/api/gateway/${id}');
+const _remove = (ids) => {
+    return instance.delete('/api/gateway/', {data: { ids}});
 };
 
 const _fetch = () => {

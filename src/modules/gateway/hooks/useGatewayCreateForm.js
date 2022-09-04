@@ -54,7 +54,7 @@ const useGatewayCreateForm = () => {
     defaultValues: {
       serialNumber: '',
       name: '',
-      ipv4: ''
+      ipv4: '',
     }
   });
 
@@ -71,7 +71,10 @@ const useGatewayCreateForm = () => {
     isLoading,
     isSuccess,
     data,
-    onSubmit: handleSubmit((values) => mutate(values))
+    onSubmit: handleSubmit((values) => {
+      console.log({values})
+      mutate(values)
+    })
   };
 };
 

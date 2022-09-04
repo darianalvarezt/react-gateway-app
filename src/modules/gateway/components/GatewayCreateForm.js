@@ -1,18 +1,20 @@
 import * as React from 'react'
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Grid, Stack, TextField, Typography, IconButton, Button, Toolbar, Tooltip, ListItem, List, Divider } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
-import Button from '@mui/material/Button';
 import { Controller } from "react-hook-form";
-import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
-import Divider from '@mui/material/Divider';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import useGatewayCreateForm from '../hooks/useGatewayCreateForm'
 
-const GatewayCreateForm = () => {
-    const [devices, setDevices] = React.useState([{}]);
+const GatewayCreateForm = (props) => {
+    const {onClose} = props
+    const [devices, setDevices] = React.useState([])
 
     const {
       control,
@@ -24,58 +26,59 @@ const GatewayCreateForm = () => {
     } = useGatewayCreateForm()
 
     const handleAddNewDevice = () => {
+        setDevices(prev => [...prev, {id: prev.length + 1}])
+    }
+
+    const handleRemoveDeviceClick = (index) => {
         setDevices(prev => {
-            prev.push({})
-            return prev
+            prev.splice(index, 1)
+            return [...prev]
         })
     }
 
-    return <>
-        <Typography id="transition-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-            Create gateway entry
-        </Typography>
-       
+    React.useEffect(() => {
+        isSuccess && onClose()
+    }, [isSuccess])
 
-        <form onSubmit={onSubmit}>
+    return <form onSubmit={onSubmit}>
             <Box>
                 <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                    <Grid item xs={12} md={12}>
-                    <Controller
-                        name="serialNumber"
-                        control={control}
-                        render={({ field }) => (<TextField
-                            error={!!errors?.serialNumber}
-                            helperText={errors?.serialNumber?.message}
-                            sx={{ width: '100%' }}
-                            id="serialNumber"
-                            label="Serial Number"
-                            placeholder="Value"
-                            {...field}
-                    />)}
-                    /> 
+                    <Grid item xs={6} md={12}>
+                        <Controller
+                            name="serialNumber"
+                            control={control}
+                            render={({ field }) => (<TextField
+                                error={!!errors?.serialNumber}
+                                helperText={errors?.serialNumber?.message}
+                                sx={{ width: '100%' }}
+                                label="Serial Number"
+                                placeholder="Value"
+                                {...field}
+                        />)}
+                        /> 
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                    <Controller
-                        name="name"
-                        control={control}
-                        render={({ field }) => (<TextField
-                            error={!!errors?.name}
-                            helperText={errors?.name?.message}
-                            id="name"
-                            label="Name"
-                            placeholder="Value"
-                            {...field}
-                    />)}
-                    />
+                    <Grid item xs={6} md={6}>
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field }) => (<TextField
+                                error={!!errors?.name}
+                                helperText={errors?.name?.message}
+                                sx={{ width: '100%' }}
+                                label="Name"
+                                placeholder="Value"
+                                {...field}
+                        />)}
+                        />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={4} md={6}>
                     <Controller
                         name="ipv4"
                         control={control}
                         render={({ field }) => (<TextField
                             error={!!errors?.ipv4}
                             helperText={errors?.ipv4?.message}
-                            id="ipv4"
+                            sx={{ width: '100%' }}
                             label="IPV4"
                             placeholder="Value"
                             {...field}
@@ -83,24 +86,100 @@ const GatewayCreateForm = () => {
                     />
                     </Grid>
 
-                    <Grid item xs={12} md={13}>
-                    <Divider />
+                    <Grid item xs={12} md={12}>
+                    
                     <List>
                     {devices.map((dev, index) => {
-                        return (<ListItem disablePadding><Grid item xs={12} md={6} pt={2}>
-                            <Controller
-                                name={`devices.${index}.uid`}
-                                control={control}
-                                render={({ field }) => (<TextField
-                                    error={!!errors?.devices?.[index]?.uid}
-                                    helperText={errors?.devices?.[index]?.uid?.message}
-                                    id={`devices.${index}.uid`}
-                                    label="UID"
-                                    placeholder="Value"
-                                    {...field}
-                            />)}
-                            />
-                             </Grid></ListItem>)
+                        return (<Box key={dev.id}>
+                        <Divider/>
+                        <Toolbar
+                            sx={{pl: { sm: 2 }, pr: { xs: 1, sm: 1 }}}
+                        >
+                            <Typography
+                                sx={{ flex: '1 1 100%', my: 2 }}
+                                variant="h6"
+                                id="tableTitle"
+                                component="div"
+                            >
+                                {`Device ${index + 1}`}
+                            </Typography>
+                            <Tooltip title="Delete">
+                                <IconButton
+                                    onClick={() => handleRemoveDeviceClick(index)}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Toolbar>
+                        <ListItem disablePadding sx={{ mb: 2 }}>
+                                <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                                    <Grid item xs={12} md={6} pt={2}>
+                                        <Controller
+                                            name={`devices.${index}.uid`}
+                                            control={control}
+                                            render={({ field }) => (<TextField
+                                                error={!!errors?.devices?.[index]?.uid}
+                                                helperText={errors?.devices?.[index]?.uid?.message}
+                                                sx={{ width: '100%' }}
+                                                label="UID"
+                                                placeholder="Value"
+                                                {...field}
+                                            />)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6} pt={2}>
+                                        <Controller
+                                            name={`devices.${index}.vendor`}
+                                            control={control}
+                                            render={({ field }) => (<TextField
+                                                error={!!errors?.devices?.[index]?.vendor}
+                                                helperText={errors?.devices?.[index]?.vendor?.message}
+                                                sx={{ width: '100%' }}
+                                                label="Vendor"
+                                                placeholder="Value"
+                                                {...field}
+                                            />)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6} pt={2}>
+                                        <Controller
+                                            name={`devices.${index}.date`}
+                                            control={control}
+                                            render={({ field }) => (
+                                                    <DatePicker
+                                                    error={!!errors?.devices?.[index]?.date}
+                                                    helperText={errors?.devices?.[index]?.date?.message}                                         
+                                                    sx={{ width: '100%' }}
+                                                    label="Date"
+                                                    placeholder="Value"
+                                                    renderInput={(params) => <TextField {...params}/>}
+                                                    {...field}
+                                                    />
+                                              )}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6} pt={2}>
+                                        <Controller
+                                            name={`devices.${index}.status`}
+                                            control={control}
+                                            render={({ field }) => (
+                                                <FormControl fullWidth>
+                                                    <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                                    <Select
+                                                        labelId="demo-simple-select-label"
+                                                        id="demo-simple-select"
+                                                        label="Status"
+                                                        {...field}
+                                                    >
+                                                        <MenuItem value={'online'}>Online</MenuItem>
+                                                        <MenuItem value={'offline'}>Offline</MenuItem>
+                                                    </Select>
+                                                </FormControl>
+                                            )}
+                                        />
+                                    </Grid>
+                                </Grid>
+                             </ListItem></Box>)
                     })
 
                     }
@@ -126,7 +205,6 @@ const GatewayCreateForm = () => {
                 </Box>
             </Box>
         </form>
-    </>
 }
 
 export default React.memo(GatewayCreateForm)
