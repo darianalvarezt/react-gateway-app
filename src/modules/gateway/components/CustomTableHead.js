@@ -3,42 +3,15 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
-
-const headCells = [
-    {
-      id: 'serialNumber',
-      numeric: false,
-      disablePadding: true,
-      label: 'Serial Number',
-    },
-    {
-      id: 'name',
-      numeric: false,
-      disablePadding: false,
-      label: 'Name',
-    },
-    {
-      id: 'ipv4',
-      numeric: false,
-      disablePadding: false,
-      label: 'IPV4',
-    },
-    {
-      id: 'devices',
-      numeric: true,
-      disablePadding: false,
-      label: 'Devices (units)',
-    },
-  ]
   
   const CustomTableHead = (props) => {
-    const { onSelectAllClick, numSelected, rowCount } =
+    const { onSelectAllClick, numSelected, rowCount, headCells, checkbox = true, expand = true } =
       props;
   
     return (
       <TableHead>
         <TableRow>
-          <TableCell padding="checkbox">
+          {checkbox && <TableCell padding="checkbox">
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -48,8 +21,9 @@ const headCells = [
                 'aria-label': 'select all desserts',
               }}
             />
-        </TableCell>
-        {headCells.map((headCell) => (
+        </TableCell>}
+        {expand && <TableCell/>}
+        {headCells?.map((headCell) => (
         <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
