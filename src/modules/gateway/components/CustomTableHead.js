@@ -1,17 +1,21 @@
-import * as React from 'react';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
-  
-  const CustomTableHead = (props) => {
-    const { onSelectAllClick, numSelected, rowCount, headCells, checkbox = true, expand = true } =
-      props;
-  
-    return (
-      <TableHead>
-        <TableRow>
-          {checkbox && <TableCell padding="checkbox">
+import * as React from 'react'
+import { TableCell, TableHead, TableRow, Checkbox } from '@mui/material'
+
+const CustomTableHead = (props) => {
+  const {
+    onSelectAllClick,
+    numSelected,
+    rowCount = 0,
+    headCells,
+    checkbox = true,
+    expand = true,
+  } = props
+
+  return (
+    <TableHead>
+      <TableRow>
+        {checkbox && (
+          <TableCell padding="checkbox">
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -21,20 +25,20 @@ import Checkbox from '@mui/material/Checkbox';
                 'aria-label': 'select all desserts',
               }}
             />
-        </TableCell>}
-        {expand && <TableCell/>}
+          </TableCell>
+        )}
+        {expand && <TableCell />}
         {headCells?.map((headCell) => (
-        <TableCell
+          <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-        >
+            padding={headCell.disablePadding ? 'none' : 'normal'}>
             {headCell.label}
-        </TableCell>
+          </TableCell>
         ))}
-        </TableRow>
-      </TableHead>
-    );
-  }
+      </TableRow>
+    </TableHead>
+  )
+}
 
-  export default CustomTableHead
+export default CustomTableHead

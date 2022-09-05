@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { _remove } from '../../../api/APIService'
 
@@ -11,13 +10,12 @@ const useDeleteManyGateway = () => {
     },
   })
 
-
   return {
     error,
     isLoading,
     isSuccess,
-    onDelete: mutate
-  };
-};
+    onDelete: mutate,
+  }
+}
 
-export default useDeleteManyGateway;
+export default useDeleteManyGateway

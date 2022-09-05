@@ -1,15 +1,9 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
+import * as React from 'react'
 
-import GatewayList from './modules/gateway/pages/GatewayList';
+import GatewayList from './modules/gateway/pages/GatewayList'
 
-function App() {
-
-  return (
-    <Box sx={{ width: '100%' }}>
-      <GatewayList/>
-    </Box>
-  );
+const App = () => {
+  return <GatewayList />
 }
 
-export default App;
+export default App

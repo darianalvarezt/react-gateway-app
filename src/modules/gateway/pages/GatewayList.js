@@ -1,18 +1,23 @@
 import * as React from 'react'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
-import toast from "react-hot-toast"
-import Container from '@mui/material/Container'
+import {
+  Table,
+  TableBody,
+  TableContainer,
+  Paper,
+  Container,
+  Stack,
+} from '@mui/material'
+import toast from 'react-hot-toast'
+import { InfinitySpin } from 'react-loader-spinner'
 
-import useFindGateways from '../hooks/useFindGateways'
-import useDeleteManyGateway from '../hooks/useDeleteManyGateway'
-import CustomTableHead from '../components/CustomTableHead'
-import CustomTableToolbar from '../components/CustomTableToolbar'
-import GatewayCreateForm from '../components/GatewayCreateForm'
-import CustomModal from '../components/CustomModal'
-import Row from '../components/Row'
+import { useFindGateways, useDeleteManyGateway } from '../hooks'
+import {
+  Row,
+  CustomModal,
+  GatewayCreateForm,
+  CustomTableToolbar,
+  CustomTableHead,
+} from '../components'
 
 const headCells = [
   {
@@ -69,79 +74,89 @@ const detailsHeadCells = [
 ]
 
 const GatewayList = () => {
-    const [selected, setSelected] = React.useState(new Set([]))
-    const [open, setOpen] = React.useState(false)
+  const [selected, setSelected] = React.useState(new Set([]))
+  const [open, setOpen] = React.useState(false)
 
-    const {
-      error: deleteError,
-      isLoading,
-      isSuccess: deleteSuccess,
-      onDelete
-    } = useDeleteManyGateway()
+  const isSelected = (_id) => selected.has(_id)
 
-    const handleSelectAllClick = (event) => {
-      if (event.target.checked) {
-        const newSelected = gateways.map((n) => n._id);
-        setSelected(new Set(newSelected));
-        return;
-      }
-      setSelected(new Set([]));
+  const { isLoading, error, gateways } = useFindGateways()
+
+  const {
+    error: deleteError,
+    isLoading: deleteLoading,
+    isSuccess: deleteSuccess,
+    onDelete,
+  } = useDeleteManyGateway()
+
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = gateways.map((n) => n._id)
+      setSelected(new Set(newSelected))
+      return
     }
-  
-    const handleClick = (event, _id) => {
-      if (!selected.delete(_id)) {
-        selected.add(_id)
-      }
-  
-      setSelected(new Set(selected));
-    }
+    setSelected(new Set([]))
+  }
 
-    const handleAddClick = () => {
-        setOpen(prev => !prev)
+  const handleClick = (event, _id) => {
+    if (!selected.delete(_id)) {
+      selected.add(_id)
     }
 
-    const handleRemoveClick = () => {
-      onDelete([...selected.values()])
+    setSelected(new Set(selected))
+  }
+
+  const handleAddClick = () => {
+    setOpen((prev) => !prev)
+  }
+
+  const handleRemoveClick = () => {
+    onDelete([...selected.values()])
+  }
+
+  React.useEffect(() => {
+    if (deleteSuccess) {
+      setSelected(new Set([]))
     }
-  
-    const isSelected = (_id) => selected.has(_id);
+  }, [deleteSuccess])
 
-    const { error, gateways } = useFindGateways();
+  React.useEffect(() => {
+    if (error || deleteError) toast.error(error.message || deleteError.message)
+  }, [error, deleteError])
 
-    React.useEffect(() => {
-      if (deleteSuccess) {
-        setSelected(new Set([]));
-      }
-    }, [deleteSuccess])
+  if (isLoading || deleteLoading)
+    return (
+      <Stack
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        spacing={2}>
+        <InfinitySpin width="200" color="black" />
+      </Stack>
+    )
 
-    React.useEffect(() => {
-        if (error || deleteError) toast.error(error.message || deleteError.message);
-    }, [error, deleteError])
-    
-    return <Container maxWidth="lg">
-    <Paper sx={{ width: '100%', mb: 2 }}>
-      <CustomTableToolbar
-        numSelected={selected.size}
-        onAddClick={handleAddClick}
-        onRemoveClick={handleRemoveClick}
-      />
-      <TableContainer>
-        <Table
-          sx={{ minWidth: 750 }}
-          aria-labelledby="tableTitle"
-          size={'small'}
-        >
-          <CustomTableHead
-            headCells={headCells}
-            numSelected={selected.size}
-            onSelectAllClick={handleSelectAllClick}
-            rowCount={gateways?.length || 0}
-          />
-          <TableBody>
-            {gateways?.map((row, index) => {
-                const isItemSelected = isSelected(row._id);
-                const labelId = `custom-table-checkbox-${index}`;
-
+  return (
+    <Container maxWidth="lg">
+      <Paper sx={{ width: '100%' }}>
+        <CustomTableToolbar
+          numSelected={selected.size}
+          onAddClick={handleAddClick}
+          onRemoveClick={handleRemoveClick}
+        />
+        <TableContainer>
+          <Table
+            sx={{ minWidth: 750 }}
+            aria-labelledby="tableTitle"
+            size={'small'}>
+            <CustomTableHead
+              headCells={headCells}
+              numSelected={selected.size}
+              onSelectAllClick={handleSelectAllClick}
+              rowCount={gateways?.length}
+            />
+            <TableBody>
+              {gateways?.map((row, index) => {
+                const isItemSelected = isSelected(row._id)
+                const labelId = `custom-table-checkbox-${index}`
                 return (
                   <Row
                     key={row._id}
@@ -150,26 +165,18 @@ const GatewayList = () => {
                     labelId={labelId}
                     isItemSelected={isItemSelected}
                     headCells={detailsHeadCells}
-                    />
-                );
+                  />
+                )
               })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
-    <CustomModal
-        open={open}
-        onClose={handleAddClick}
-    >
-        <GatewayCreateForm
-          onClose={handleAddClick}
-        />
-    </CustomModal>
-  </Container>
-
-    
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+      <CustomModal open={open} onClose={handleAddClick}>
+        <GatewayCreateForm onClose={handleAddClick} />
+      </CustomModal>
+    </Container>
+  )
 }
 
 export default GatewayList
-
-
