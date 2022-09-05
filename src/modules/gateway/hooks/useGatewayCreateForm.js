@@ -18,23 +18,23 @@ Yup.addMethod(Yup.string, 'ipv4', function (args) {
 })
 
 const deviceSchema = Yup.object().shape({
-  uid: Yup.number().required('required').typeError('Must be a number'),
+  uid: Yup.number().required('UID is required').typeError('Must be a number'),
 
-  vendor: Yup.string().required('required'),
+  vendor: Yup.string().required('Vendor is required'),
 
-  date: Yup.date().required('required'),
+  date: Yup.date().required('Date is required'),
 
   status: Yup.string()
-    .required('required')
+    .required('Status is required')
     .matches(/(online|offline)/),
 })
 
 const gatewaySchema = Yup.object().shape({
-  serialNumber: Yup.string().required('required'),
+  serialNumber: Yup.string().required('Serial number is required'),
 
-  name: Yup.string().required('required'),
+  name: Yup.string().required('Name is required'),
 
-  ipv4: Yup.string().required('required').ipv4(),
+  ipv4: Yup.string().required('Ipv4 is required').ipv4(),
 
   devices: Yup.lazy(() => Yup.array().of(deviceSchema).max(10)),
 })
