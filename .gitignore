@@ -120,6 +120,7 @@ fabric.properties
 logs
 **/*.backup.*
 **/*.back.*
+build
 
 node_modules
 bower_components
@@ -231,3 +232,6 @@ sketch
 # https://plugins.jetbrains.com/plugin/8053-azure-toolkit-for-intellij
 
 # End of https://www.toptal.com/developers/gitignore/api/react,jetbrains,webstorm,visualstudiocode
+
+# Prettier
+.prettierignore

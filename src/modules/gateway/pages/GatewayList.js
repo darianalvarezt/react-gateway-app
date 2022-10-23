@@ -77,7 +77,7 @@ const GatewayList = () => {
   const [selected, setSelected] = React.useState(new Set([]))
   const [open, setOpen] = React.useState(false)
 
-  const isSelected = (_id) => selected.has(_id)
+  const isSelected = (id) => selected.has(id)
 
   const { isLoading, error, gateways } = useFindGateways()
 
@@ -90,7 +90,7 @@ const GatewayList = () => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = gateways.map((n) => n._id)
+      const newSelected = gateways.map(({_id: id}) => id)
       setSelected(new Set(newSelected))
       return
     }
@@ -146,7 +146,7 @@ const GatewayList = () => {
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
-            size={'small'}>
+            size="small">
             <CustomTableHead
               headCells={headCells}
               numSelected={selected.size}
