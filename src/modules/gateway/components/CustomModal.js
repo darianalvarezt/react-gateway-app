@@ -8,7 +8,7 @@ const CustomModal = (props) => {
     <Dialog
       open={open}
       onClose={onClose}
-      scroll={'paper'}
+      scroll="paper"
       aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description">
       <DialogTitle id="scroll-dialog-title">Create Gateway Entry</DialogTitle>

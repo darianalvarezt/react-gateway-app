@@ -45,7 +45,7 @@ const GatewayCreateForm = (props) => {
   }
 
   React.useEffect(() => {
-    isSuccess && onClose()
+    if (isSuccess) onClose();
   }, [isSuccess, onClose])
 
   React.useEffect(() => {
@@ -109,8 +109,7 @@ const GatewayCreateForm = (props) => {
           </Grid>
           <Grid item xs={12} md={12}>
             <List>
-              {devices.map((dev, index) => {
-                return (
+              {devices.map((dev, index) => (
                   <Box key={dev.id}>
                     <Divider />
                     <Toolbar sx={{ pl: { sm: 2 }, pr: { xs: 1, sm: 1 } }}>
@@ -204,8 +203,8 @@ const GatewayCreateForm = (props) => {
                                   id="demo-simple-select"
                                   label="Status"
                                   {...field}>
-                                  <MenuItem value={'online'}>Online</MenuItem>
-                                  <MenuItem value={'offline'}>Offline</MenuItem>
+                                  <MenuItem value="online">Online</MenuItem>
+                                  <MenuItem value="offline">Offline</MenuItem>
                                 </Select>
                               </FormControl>
                             )}
@@ -214,8 +213,7 @@ const GatewayCreateForm = (props) => {
                       </Grid>
                     </ListItem>
                   </Box>
-                )
-              })}
+                ))}
             </List>
 
             <Box py={2}>
@@ -224,7 +222,7 @@ const GatewayCreateForm = (props) => {
                   variant="outlined"
                   startIcon={<AddIcon />}
                   onClick={handleAddNewDevice}>
-                  {'add device'}
+                  add device
                 </Button>
               </Stack>
             </Box>
@@ -235,9 +233,9 @@ const GatewayCreateForm = (props) => {
           <Stack alignItems="flex-end">
             <LoadingButton
               variant="contained"
-              type={'submit'}
+              type="submit"
               loading={isLoading}>
-              {'Create'}
+              Create
             </LoadingButton>
           </Stack>
         </Box>

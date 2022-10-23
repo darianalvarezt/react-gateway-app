@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { _create } from '../../../api/APIService'
+import { create } from '../../../api/APIService'
 
 Yup.addMethod(Yup.string, 'ipv4', function (args) {
   const { message = 'Invalid ipv4 address' } = args || {}
@@ -55,7 +55,7 @@ const useGatewayCreateForm = () => {
     },
   })
 
-  const { mutate, error, isLoading, isSuccess, data } = useMutation(_create, {
+  const { mutate, error, isLoading, isSuccess, data } = useMutation(create, {
     onSuccess: () => {
       queryClient.invalidateQueries(['gateways'])
     },
